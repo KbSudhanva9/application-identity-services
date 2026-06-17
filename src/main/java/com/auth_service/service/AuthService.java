@@ -77,8 +77,6 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.valueOf(request.getRole().toUpperCase()).toString())	
-//                .deposit(0.0)
-//                .usedDeposit(0.0)
                 .build();
 
         userRepository.save(user);
@@ -178,8 +176,6 @@ public class AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-//                .usedDeposit(user.getUsedDeposit())
-//                .deposit(user.getDeposit())
                 .redirectUrl(redirectionUrl.getRedirectUrl())
                 .callbackUrl("http://localhost:5173/")
                 .build();
@@ -216,8 +212,6 @@ public class AuthService {
                         .name(user.getName())
                         .email(user.getEmail())
                         .role(user.getRole())
-//                        .usedDeposit(user.getUsedDeposit())
-//                        .deposit(user.getDeposit())
                         .createdAt(user.getCreatedAt())
                         .isActive(user.isActive())
                         .build()

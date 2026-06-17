@@ -18,10 +18,6 @@ public class ProfileResponse {
     private String email;
 
     private String role;
-
-//    private Double usedDeposit;
-//
-//    private Double deposit;
     
     private String redirectUrl;
     

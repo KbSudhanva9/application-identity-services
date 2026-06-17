@@ -14,10 +14,6 @@ public class UserFilterRequest {
 
     private String role;
 
-//    private Double usedDeposit;
-//
-//    private Double deposit;
-
     private Boolean isActive;
 
 }
