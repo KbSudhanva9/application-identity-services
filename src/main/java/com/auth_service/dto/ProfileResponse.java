@@ -19,9 +19,9 @@ public class ProfileResponse {
 
     private String role;
 
-    private Double usedDeposit;
-
-    private Double deposit;
+//    private Double usedDeposit;
+//
+//    private Double deposit;
     
     private String redirectUrl;
     

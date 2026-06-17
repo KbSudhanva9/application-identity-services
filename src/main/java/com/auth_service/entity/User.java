@@ -32,11 +32,11 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "used_deposit")
-    private Double usedDeposit;
-
-    @Column(name = "deposit")
-    private Double deposit;
+//    @Column(name = "used_deposit")
+//    private Double usedDeposit;
+//
+//    @Column(name = "deposit")
+//    private Double deposit;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

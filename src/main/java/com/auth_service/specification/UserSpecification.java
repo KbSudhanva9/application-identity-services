@@ -37,17 +37,17 @@ public class UserSpecification {
                         cb.equal(root.get("role"), request.getRole()));
             }
 
-            // USED DEPOSIT
-            if (request.getUsedDeposit() != null) {
-                predicates.add(
-                        cb.equal(root.get("usedDeposit"), request.getUsedDeposit()));
-            }
-
-            // DEPOSIT
-            if (request.getDeposit() != null) {
-                predicates.add(
-                        cb.equal(root.get("deposit"), request.getDeposit()));
-            }
+//            // USED DEPOSIT
+//            if (request.getUsedDeposit() != null) {
+//                predicates.add(
+//                        cb.equal(root.get("usedDeposit"), request.getUsedDeposit()));
+//            }
+//
+//            // DEPOSIT
+//            if (request.getDeposit() != null) {
+//                predicates.add(
+//                        cb.equal(root.get("deposit"), request.getDeposit()));
+//            }
 
             // IS ACTIVE
             if (request.getIsActive() != null) {

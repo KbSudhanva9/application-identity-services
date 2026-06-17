@@ -18,9 +18,9 @@ public class UserResponse {
 
     private String role;
 
-    private Double usedDeposit;
-
-    private Double deposit;
+//    private Double usedDeposit;
+//
+//    private Double deposit;
 
     private LocalDateTime createdAt;
 
