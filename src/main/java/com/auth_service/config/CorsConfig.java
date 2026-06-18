@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Allow all endpoints in the app
-                        .allowedOrigins("http://localhost:5173") // Your Vite dev server port
+                        .allowedOrigins("http://localhost:5173","http://localhost:5174") // Your Vite dev server port
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

@@ -29,7 +29,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         Log log = Log.builder()
 //        		.userId(request.getRequestId())
 //        		.userId(request.getProtocol())
-        		.message(request.getUserPrincipal().toString())
+//        		.message(request.getUserPrincipal().toString())
 //        		.userId(request.get)
                 .apiEndpoint(request.getRequestURI())
                 .httpMethod(request.getMethod())
