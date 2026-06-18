@@ -26,4 +26,6 @@ public interface AuthService {
 	
 	String resetPassword(ResetPasswordRequest request);
 
+	AuthResponse exchangeSession(String session);
+
 }

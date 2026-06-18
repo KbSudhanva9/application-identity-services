@@ -2,7 +2,8 @@ package com.auth_service.dto;
 
 public record AuthResponse(
 		String accessToken,
-		String refreshToken) {
+		String refreshToken,
+		String sessionId) {
 }
 
 //import lombok.AllArgsConstructor;

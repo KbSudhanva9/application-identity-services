@@ -5,6 +5,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.auth_service.entity.UserSession;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 
@@ -21,7 +23,6 @@ public class JwtUtil {
     private long refreshTokenExpiration;
 
     private SecretKey getKey() {
-
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -36,7 +37,7 @@ public class JwtUtil {
 //                .compact();
 //    }
     
-    public String generateAccessToken(String email, String role, String userId) {
+    public String generateAccessToken(String email, String role, String userId, String tokenType) {
 
         return Jwts.builder()
         		.subject(userId)
@@ -44,21 +45,21 @@ public class JwtUtil {
                 .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date())
-                .issuer("auth-service")
-                .claim("type", "accessToken")
+                .issuer("APPLICATION-IDENTITY")
+                .claim("type", tokenType)//"accessToken")
                 .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(getKey())
                 .compact();
     }
 
-    public String generateRefreshToken(String userId, String email) {
+    public String generateRefreshToken(String userId, String email, String tokenType) {
 
         return Jwts.builder()
                 .subject(userId)
                 .claim("email", email)
                 .issuedAt(new Date())
-                .issuer("auth-service")
-                .claim("type", "refreshToken")
+                .issuer("APPLICATION-IDENTITY")
+                .claim("type", tokenType)//"refreshToken")
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
                 .signWith(getKey())
                 .compact();
@@ -89,7 +90,7 @@ public class JwtUtil {
     		Claims claims = extractClaims(token);
     		String type = claims.get("type", String.class);
             Date expiration = claims.getExpiration();
-    		return "refreshToken".equals(type)
+    		return "REFRESH_TOKEN".equals(type)
             		&& expiration != null
                     && expiration.after(new Date());
     	} catch (Exception e) {
@@ -116,9 +117,23 @@ public class JwtUtil {
     public boolean validateAccessToken(String token) {
         try {
             Claims claims = extractClaims(token);
+//            String type = claims.get("type", String.class);
+            Date expiration = claims.getExpiration();
+            return //"accessToken".equals(type) && 
+            		expiration != null
+                    && expiration.after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    public boolean validateAccessTokenServices(String token) {
+        try {
+            Claims claims = extractClaims(token);
             String type = claims.get("type", String.class);
             Date expiration = claims.getExpiration();
-            return "accessToken".equals(type)
+            return "LOGIN_TOKEN".equals(type)
+//            		("LOGIN_TOKEN".equals(type) || "REFRESH_TOKEN".equals(type))
             		&& expiration != null
                     && expiration.after(new Date());
         } catch (Exception e) {

@@ -86,6 +86,16 @@ public class AuthController {
         }
     }
     
+    @GetMapping("/session/exchange")
+    public ResponseEntity<ApiResponse<?>> exchange(@RequestParam String sessionId){
+    	try {
+    		return ResponseEntity.ok( new ApiResponse<>("Session Generated Sussfully", authService.exchangeSession(sessionId)));
+    	} catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(e.getMessage(), null)
+                    );
+        }
+    }
+    
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<?>> getProfile(@RequestHeader("Authorization") String token) {
         try {
@@ -140,14 +150,9 @@ public class AuthController {
             @RequestBody ResetPasswordRequest request) {
 
         try {
-
             request.setUserId(userId);
-
             String response = authService.resetPassword(request);
-
-            return ResponseEntity.ok(
-                    new ApiResponse<>(response, null)
-            );
+            return ResponseEntity.ok(new ApiResponse<>(response, null));
 
         } catch (Exception e) {
 
@@ -155,4 +160,6 @@ public class AuthController {
                     .body(new ApiResponse<>(e.getMessage(), null));
         }
     }
+    
+    
 }
