@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth_service.enums.TokenType;
 import com.auth_service.util.JwtUtil;
 
 import java.io.IOException;
@@ -40,6 +41,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+        
+        String tokenType = jwtUtil.extractTokenType(token);
+        
+        if(!tokenType.equals(TokenType.LOGIN_TOKEN.name())){
+//        	System.out.println(tokenType);
+            throw new RuntimeException(
+                    "Invalid token type"
+            );
+        }
 
         boolean valid = jwtUtil.validateAccessToken(token);
 

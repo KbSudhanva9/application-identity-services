@@ -22,6 +22,7 @@ import com.auth_service.dto.UserResponse;
 import com.auth_service.entity.MasterRedirections;
 import com.auth_service.entity.User;
 import com.auth_service.entity.UserSession;
+import com.auth_service.enums.TokenType;
 import com.auth_service.repository.MasterRedirectionsRepository;
 import com.auth_service.repository.UserRepository;
 import com.auth_service.repository.UserSessionRepository;
@@ -61,11 +62,11 @@ public class AuthServiceImpl implements AuthService {
     	EMAIL_VERIFICATION
     }
     
-    private enum sessionType{
-    	SSO_LOGIN,
-    	LOGIN_TOKEN,
-    	REFRESH_TOKEN
-    }
+//    private enum sessionType{
+//    	SSO_LOGIN,
+//    	LOGIN_TOKEN,
+//    	REFRESH_TOKEN
+//    }
 
     public String register(RegisterRequest request) {
 
@@ -88,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.valueOf(request.role().toUpperCase()).toString())	
+                .isActive(true) //added this for default activation
                 .build();
 
         userRepository.save(user);
@@ -117,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(),
                 user.getRole(),
                 user.getUserId(),
-                sessionType.SSO_LOGIN.name()
+                TokenType.SSO_LOGIN.name()
         );
 
 //        String refreshToken = jwtUtil.generateRefreshToken(
@@ -131,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
         
         session.setUserId(user.getUserId());
         session.setSessionId(sessionId);
-        session.setSessionType(sessionType.SSO_LOGIN.name());
+        session.setSessionType(TokenType.SSO_LOGIN.name());
         session.setAccessToken(accessToken);
         session.setExpireTime(LocalDateTime.now().plusMinutes(5));
         session.setCreatedOn(LocalDateTime.now());
@@ -164,13 +166,13 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(),
                 user.getRole(),
                 user.getUserId(),
-                sessionType.LOGIN_TOKEN.name()
+                TokenType.LOGIN_TOKEN.name()
         );
 
         String newRefreshToken = jwtUtil.generateRefreshToken(
         		user.getUserId(),
                 user.getEmail(),
-                sessionType.REFRESH_TOKEN.name()
+                TokenType.REFRESH_TOKEN.name()
         );
         
         String sessionId = UUID.randomUUID().toString();
@@ -179,7 +181,7 @@ public class AuthServiceImpl implements AuthService {
         
         session.setUserId(user.getUserId());
         session.setSessionId(sessionId);
-        session.setSessionType(sessionType.REFRESH_TOKEN.name());
+        session.setSessionType(TokenType.REFRESH_TOKEN.name());
         session.setAccessToken(newAccessToken);
         session.setExpireTime(LocalDateTime.now().plusMinutes(60));
         session.setCreatedOn(LocalDateTime.now());
@@ -237,7 +239,7 @@ public class AuthServiceImpl implements AuthService {
     	
     	UserSession session = validateActiveSession(sessionId);
     	
-    	if (!sessionType.SSO_LOGIN.name().equals(session.getSessionType())) {
+    	if (!TokenType.SSO_LOGIN.name().equals(session.getSessionType())) {
             throw new RuntimeException("Invalid session type");
         }
     	
@@ -272,13 +274,13 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(),
                 user.getRole(),
                 user.getUserId(),
-                sessionType.LOGIN_TOKEN.name()
+                TokenType.LOGIN_TOKEN.name()
         );
 
         String newRefreshToken = jwtUtil.generateRefreshToken(
         		user.getUserId(),
                 user.getEmail(),
-                sessionType.REFRESH_TOKEN.name()
+                TokenType.REFRESH_TOKEN.name()
         );
 
 //    	old session
@@ -290,7 +292,7 @@ public class AuthServiceImpl implements AuthService {
     	
     	newSession.setUserId(user.getUserId());
     	newSession.setSessionId(UUID.randomUUID().toString());
-    	newSession.setSessionType(sessionType.LOGIN_TOKEN.name());
+    	newSession.setSessionType(TokenType.LOGIN_TOKEN.name());
     	newSession.setAccessToken(newAccessToken);
     	newSession.setExpireTime(LocalDateTime.now().plusMinutes(60));
     	newSession.setCreatedOn(LocalDateTime.now());

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth_service.entity.UserSession;
+import com.auth_service.enums.TokenType;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -83,6 +84,11 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+    
+    public String extractTokenType(String token) {
+        Claims claims = extractClaims(token);
+        return claims.get("type", String.class);
     }
     
     public boolean validateRefreshToken(String token) {
