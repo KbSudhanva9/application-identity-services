@@ -29,7 +29,7 @@ public class ProfileResponse {
 
     private String role;
     
-    private String redirectUrl;
+//    private String redirectUrl;
     
-    private String callbackUrl;
+//    private String callbackUrl;
 }

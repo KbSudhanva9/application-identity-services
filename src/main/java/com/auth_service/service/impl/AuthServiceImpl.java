@@ -53,8 +53,6 @@ public class AuthServiceImpl implements AuthService {
     	USER
     };
     
-//    private String sessionId = UUID.randomUUID().toString();
-    
     private enum OtpType{
     	LOGIN,
     	REGISTER,
@@ -101,6 +99,9 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        MasterRedirections redirectionUrl = masterRedirectionsRepository.findByRole(
+        		user.getRole().toString());
 
         if(user.isActive() == false) {
         	throw new RuntimeException("User is in-active, Please contact to support.");
@@ -121,11 +122,6 @@ public class AuthServiceImpl implements AuthService {
                 user.getUserId(),
                 TokenType.SSO_LOGIN.name()
         );
-
-//        String refreshToken = jwtUtil.generateRefreshToken(
-//        		user.getUserId(),
-//        		user.getEmail()
-//        );
         
         String sessionId = UUID.randomUUID().toString();
         
@@ -144,7 +140,9 @@ public class AuthServiceImpl implements AuthService {
                 accessToken,
                 "N/A",
 //                refreshToken,
-                sessionId
+                sessionId,
+                redirectionUrl.getRedirectUrl(),
+                "http://localhost:5173/"
         );
     }
     
@@ -191,12 +189,12 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(
                 newAccessToken,
                 newRefreshToken,
-                sessionId
-        );
-        
-//    }
-        
+                sessionId,
+                null,
+                null
+        );        
     }
+    
     
     public ProfileResponse getProfile(String token) {
 
@@ -217,43 +215,23 @@ public class AuthServiceImpl implements AuthService {
         
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        MasterRedirections redirectionUrl = masterRedirectionsRepository.findByRole(
-        		user.getRole().toString());
 
         return ProfileResponse.builder()
                 .userId(user.getUserId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .redirectUrl(redirectionUrl.getRedirectUrl())
-                .callbackUrl("http://localhost:5173/")
                 .build();
     }
     
     @Transactional
     public AuthResponse exchangeSession(String sessionId){
     	
-//    	UserSession session = userSessionRepository.findBySessionIdAndIsSessionExpiredFalse(sessionId).orElseThrow(
-//    							()->new RuntimeException("Invalid session"));
-    	
     	UserSession session = validateActiveSession(sessionId);
     	
     	if (!TokenType.SSO_LOGIN.name().equals(session.getSessionType())) {
             throw new RuntimeException("Invalid session type");
         }
-    	
-//    	if(session.getExpireTime().isBefore(LocalDateTime.now())){
-//    	    session.setIsSessionExpired(true);
-//    	    userSessionRepository.save(session);
-//    	    throw new RuntimeException(
-//    	      "Session expired"
-//    	    );
-//    	}
-    	
-//    	if(!sessionType.SSO_LOGIN.name().equals(session.getSessionType())) {
-//    		throw new RuntimeException("Invalid Token");
-//    	}
 
     	String oldToken=session.getAccessToken();
 
@@ -264,8 +242,6 @@ public class AuthServiceImpl implements AuthService {
     	       "Token expired"
     	    );
     	}
-
-//    	User user = userRepository.findById(session.getUserId()).get();
     	
     	User user = userRepository.findById(session.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -299,7 +275,7 @@ public class AuthServiceImpl implements AuthService {
         
         userSessionRepository.save(newSession);
 
-    	return new AuthResponse(newAccessToken, newRefreshToken, null);
+    	return new AuthResponse(newAccessToken, newRefreshToken, null,null,null);
     }
     
     private UserSession validateActiveSession(String sessionId) {
@@ -354,17 +330,6 @@ public class AuthServiceImpl implements AuthService {
                         user.getCreatedAt(),
                         user.isActive()
                 ));
-        
-//        Page<UserResponse> responsePage =
-//                users.map(user -> UserResponse.builder()
-//                        .userId(user.getUserId())
-//                        .name(user.getName())
-//                        .email(user.getEmail())
-//                        .role(user.getRole())
-//                        .createdAt(user.getCreatedAt())
-//                        .isActive(user.isActive())
-//                        .build()
-//                );
 
         return PaginationResponse.<UserResponse>builder()
                 .content(responsePage.getContent())
