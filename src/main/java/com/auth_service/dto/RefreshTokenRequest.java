@@ -1,9 +1,15 @@
 package com.auth_service.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class RefreshTokenRequest {
+public record RefreshTokenRequest(
+		@NotNull
+		String refreshToken) {}
 
-    private String refreshToken;
-}
+//import lombok.Data;
+//
+//@Data
+//public class RefreshTokenRequest {
+//
+//    private String refreshToken;
+//}

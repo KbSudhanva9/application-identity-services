@@ -1,5 +1,14 @@
 package com.auth_service.dto;
 
+//import jakarta.validation.constraints.NotNull;
+//
+//public record UpdateUserStatus(
+//		@NotNull
+//		String userId,
+//		
+//		@NotNull
+//		Boolean isActive) {}
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

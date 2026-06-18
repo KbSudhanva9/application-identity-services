@@ -1,10 +1,21 @@
 package com.auth_service.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
 
-@Data
-public class LoginRequest {
-
-    private String email;
-    private String password;
+public record LoginRequest(
+		@NotBlank
+		String email,
+		
+		@NotBlank
+		String password) {
+	
 }
+
+//import lombok.Data;
+//
+//@Data
+//public class LoginRequest {
+//
+//    private String email;
+//    private String password;
+//}

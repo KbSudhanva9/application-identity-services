@@ -1,18 +1,33 @@
 package com.auth_service.controller;
 
-import com.auth_service.dto.*;
-import com.auth_service.entity.MasterRedirections;
-import com.auth_service.repository.MasterRedirectionsRepository;
-import com.auth_service.service.AuthService;
-
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.auth_service.dto.ApiResponse;
+import com.auth_service.dto.AuthResponse;
+import com.auth_service.dto.LoginRequest;
+import com.auth_service.dto.PaginationResponse;
+import com.auth_service.dto.ProfileResponse;
+import com.auth_service.dto.RefreshTokenRequest;
+import com.auth_service.dto.RegisterRequest;
+import com.auth_service.dto.ResetPasswordRequest;
+import com.auth_service.dto.UpdateUserStatus;
+import com.auth_service.dto.UserFilterRequest;
+import com.auth_service.dto.UserResponse;
+import com.auth_service.service.AuthService;
+//import com.auth_service.service.impl.AuthServiceImpl;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
@@ -60,7 +75,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<?>> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         try {
-            AuthResponse response = authService.refreshToken(request.getRefreshToken());
+            AuthResponse response = authService.refreshToken(request.refreshToken());
             return ResponseEntity.ok(
                     new ApiResponse<>("Token refreshed successfully",response)
             );
