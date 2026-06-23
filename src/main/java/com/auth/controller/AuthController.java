@@ -126,7 +126,7 @@ public class AuthController {
 		}
     }
     
-  
+  /*  
     @PostMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> getUsersList(
@@ -149,8 +149,7 @@ public class AuthController {
                     .body(new ApiResponse<>(e.getMessage(), null));
         }
     }
-    
-    
+    */
     @PatchMapping("/{userId}/reset-password")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> resetPassword(
@@ -190,7 +189,7 @@ public class AuthController {
     public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
         try {
             String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
-
+System.out.println("requestOtp" +otpRequest );
             if ("email".equals(channel)) {
                 String email = otpRequest.email();
                 
@@ -203,7 +202,7 @@ public class AuthController {
                 otpService.sendOtpEmail(email);
                 
             } else { // SMS or WhatsApp
-                String phone = otpRequest.phoneNumber();
+                String phone = otpRequest.phone();
                 if (phone == null || phone.isBlank()) {
                     return ResponseEntity.badRequest().body("PhoneNumber field is required for mobile channels.");
                 }
@@ -221,10 +220,13 @@ public class AuthController {
 
     @PostMapping("/verify-otp")
 	public ResponseEntity<String> verifyOtp(@RequestBody OtpRequest otpRequest) {
-		String email = otpRequest.email();
+    	System.out.println("Entering  verifyOtp " +otpRequest);
+    	//String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
+		String target = (otpRequest.email() == null) ? otpRequest.phone():otpRequest.email();
 		String otp = otpRequest.otp();
-    	System.out.println("verifyOtp OTP request for email: " + email + " with OTP: " + otp);
-    	if (otpService.validateOtp(email, otp)) {
+	
+    	System.out.println("verifyOtp OTP request : " + target + " with OTP: " + otp);
+    	if (otpService.validateOtp(target, otp)) {
             return ResponseEntity.ok("User Verified.");
         }
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Invalid or expired code.");
@@ -233,3 +235,5 @@ public class AuthController {
     
     
 }
+
+

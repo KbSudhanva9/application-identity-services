@@ -83,14 +83,16 @@ public class OtpServiceBean {
         // Enforces exactly a 5-digit number (10000 - 99999)
         int code = 10000 + secureRandom.nextInt(90000);
         String otp = String.valueOf(code);
-        
+        System.out.println("Entering sendOtpMobile()");
+
         // Cache the code against the phone number with the same strict 3-minute lifespan
         otpCache.put(phoneNumber, new OtpDetails(otp, 3));
-        System.out.println("Generated OTP for " + phoneNumber + " via [" + channel + "]: " + otp);
+        System.out.println("Generated OTP for  " + phoneNumber + " via [" + channel + "]: " + otp);
 
         String smsMessageBody = "Your verification code is: " + otp + ". It will expire in 3 minutes.";
 
         if ("whatsapp".equalsIgnoreCase(channel)) {
+        	  System.out.println(" sendOtpMobile() Channel whatsapp ");
             // WhatsApp requires the 'whatsapp:' prefix on both source and destination numbers
             String formattedTo = phoneNumber.startsWith("whatsapp:") ? phoneNumber : "whatsapp:" + phoneNumber;
             String formattedFrom = whatsappSender.startsWith("whatsapp:") ? whatsappSender : "whatsapp:" + whatsappSender;
@@ -103,12 +105,15 @@ public class OtpServiceBean {
             ).create();
             
         } else { // Fallback / Default channel assumes "sms"
+        	System.out.println(" sendOtpMobile() Channel Else SMS ");
             Message.creator(
-                new PhoneNumber(phoneNumber), // Needs E.164 format: e.g., +919876543210
+                new PhoneNumber(phoneNumber), // Needs   +919876543210
                 new PhoneNumber(smsSender),
                 smsMessageBody
             ).create();
         }
+        
+        System.out.println("Leaving sendOtpMobile()");
     }
 
     // 2. Validate OTP with Expiration Checks (Universally handles both Email and Phone keys!)

@@ -3,7 +3,7 @@ package com.auth.dto;
 public record OtpRequest(
         String email,       // Stores the email address (for email)
         String channel,     // "email", "sms", or "whatsapp"
-        String phoneNumber, //  mobile number (for sms/whatapp)
+        String phone, //  mobile number (for sms/whatapp)
         String otp          // The validation code (null when requesting an OTP)
 ) {
     
