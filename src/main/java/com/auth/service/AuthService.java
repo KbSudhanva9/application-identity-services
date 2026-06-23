@@ -22,12 +22,12 @@ public interface AuthService {
 	
 	public	String updateUserStatus(UpdateUserStatus request);
 	
-//	PaginationResponse  getUsersList(UserFilterRequest request, Integer page, Integer size);
-	
 	public	String resetPassword(ResetPasswordRequest request);
 
 	public	AuthResponse exchangeSession(String session);
 
 public	boolean isUserExists(String email);
+
+public boolean isUserPhoneExists(String phone);
 
 }

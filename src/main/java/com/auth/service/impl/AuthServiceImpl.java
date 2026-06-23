@@ -355,4 +355,11 @@ public class AuthServiceImpl implements AuthService {
 		
 	}
 
+
+	@Override
+	public boolean isUserPhoneExists(String phone) {
+		// TODO Auto-generated method stub
+		  return userRepository.existsByPhone(phone);
+	}
+
 }

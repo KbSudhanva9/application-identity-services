@@ -167,7 +167,7 @@ public class AuthController {
                     .body(new ApiResponse<>(e.getMessage(), null));
         }
     }
-    
+   /* 
     @PostMapping("/request-otp")
     public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
         try {
@@ -182,6 +182,39 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to deliver mail: " + e.getMessage());
+        }
+    }
+*/
+    @PostMapping("/request-otp")
+    public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
+        try {
+            String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
+
+            if ("email".equals(channel)) {
+                String email = otpRequest.email();
+                
+                if (email == null || email.isBlank()) {
+                    return ResponseEntity.badRequest().body("Email field is required for email channel.");
+                }
+                if (!authService.isUserExists(email)) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email does not exist.");
+                }
+                otpService.sendOtpEmail(email);
+                
+            } else { // SMS or WhatsApp
+                String phone = otpRequest.phoneNumber();
+                if (phone == null || phone.isBlank()) {
+                    return ResponseEntity.badRequest().body("PhoneNumber field is required for mobile channels.");
+                }
+                if (!authService.isUserPhoneExists(phone)) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with phone number does not exist.");
+                }
+                otpService.sendOtpMobile(phone, channel);
+            }
+
+            return ResponseEntity.ok("OTP sent successfully via " + channel.toUpperCase() + ".");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deliver OTP: " + e.getMessage());
         }
     }
 
