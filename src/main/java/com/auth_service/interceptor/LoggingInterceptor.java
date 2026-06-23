@@ -24,7 +24,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
                              Object handler) {
 
         System.out.println("Interceptor Hit : " + request.getRequestURI());
-        System.out.println("logService-data------>"+logService);
+//        System.out.println("logService-data------>"+logService);
         
         Log log = Log.builder()
 //        		.userId(request.getRequestId())
