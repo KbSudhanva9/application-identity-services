@@ -72,9 +72,9 @@ public class AuthServiceImpl implements AuthService {
 
     public String register(RegisterRequest request) {
 
-        if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
-        }
+//        if (userRepository.existsByEmail(request.email())) {
+//            throw new RuntimeException("Email already exists");
+//        }
         
         boolean validRole = java.util.Arrays.stream(Role.values())
 				.anyMatch(role -> role.toString().equalsIgnoreCase(request.role()));
@@ -221,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new ProfileResponse(user.getUserId(),user.getName(),user.getEmail(),user.getRole());
+        return new ProfileResponse(user.getUserId(),user.getName(),user.getEmail(),user.getRole(),user.getPhone());
     }
     
     @Transactional
@@ -307,7 +307,7 @@ public class AuthServiceImpl implements AuthService {
     	
     	return "User status updated successfully";
     }
-    /*
+    
     public PaginationResponse getUsersList(UserFilterRequest request, Integer page, Integer size) {
 
         Pageable pageable = PageRequest.of(
@@ -327,14 +327,15 @@ public class AuthServiceImpl implements AuthService {
                         user.getName(),
                         user.getEmail(),
                         user.getRole(),
+                        user.getPhone(),
                         user.getCreatedAt(),
                         user.isActive()
                 ));
 
-        return PaginationResponse(responsePage.getContent(),(responsePage.getNumber()+1),responsePage.getSize(),responsePage.getTotalElements(),responsePage.getTotalPages(),responsePage.isLast());
+        return new PaginationResponse(responsePage.getContent(),(responsePage.getNumber()+1),responsePage.getSize(),responsePage.getTotalElements(),responsePage.getTotalPages(),responsePage.isLast());
                 
     }
-    */
+    
     
     public String resetPassword(ResetPasswordRequest request) {
 
@@ -349,14 +350,14 @@ public class AuthServiceImpl implements AuthService {
         return "Force password reset successfully";
     }
 
-	@Override
+//	@Override
 	public boolean  isUserExists(String email) {
 		return userRepository.existsByEmail(email);
 		
 	}
 
 
-	@Override
+//	@Override
 	public boolean isUserPhoneExists(String phone) {
 		// TODO Auto-generated method stub
 		  return userRepository.existsByPhone(phone);

@@ -19,7 +19,10 @@ public record ProfileResponse (
 
       String email,
 
-      String role) {
+      String role,
+      
+      String phone
+		) {
     
 //    private String redirectUrl;
     

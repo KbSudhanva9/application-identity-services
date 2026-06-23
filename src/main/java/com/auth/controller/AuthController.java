@@ -126,7 +126,7 @@ public class AuthController {
 		}
     }
     
-  /*  
+  
     @PostMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> getUsersList(
@@ -149,7 +149,8 @@ public class AuthController {
                     .body(new ApiResponse<>(e.getMessage(), null));
         }
     }
-    */
+    
+    
     @PatchMapping("/{userId}/reset-password")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> resetPassword(

@@ -35,6 +35,9 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
     
+    @Column(name = "phone")
+    private String phone;
+    
     @PrePersist
     public void generateId() {
 
@@ -98,6 +101,14 @@ public class User {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
+	
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
     
     // Getters and setters
     

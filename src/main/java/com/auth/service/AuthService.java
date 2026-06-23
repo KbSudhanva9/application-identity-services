@@ -25,9 +25,11 @@ public interface AuthService {
 	public	String resetPassword(ResetPasswordRequest request);
 
 	public	AuthResponse exchangeSession(String session);
+	
+	public PaginationResponse getUsersList(UserFilterRequest request, Integer page, Integer size);
 
-public	boolean isUserExists(String email);
-
-public boolean isUserPhoneExists(String phone);
+	public	boolean isUserExists(String email);
+//	
+	public boolean isUserPhoneExists(String phone);
 
 }

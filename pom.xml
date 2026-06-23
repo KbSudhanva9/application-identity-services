@@ -58,10 +58,10 @@
 		</dependency>
 		-->
 		<dependency>
-    <groupId>com.twilio.sdk</groupId>
-    <artifactId>twilio</artifactId>
-    <version>10.1.0</version> <!-- Use the latest 2026 stable release -->
-</dependency>
+		    <groupId>com.twilio.sdk</groupId>
+		    <artifactId>twilio</artifactId>
+		    <version>10.1.0</version> <!-- Use the latest 2026 stable release -->
+		</dependency>
 
 		<dependency>
 		    <groupId>io.jsonwebtoken</groupId>
@@ -88,6 +88,14 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!--
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		-->
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
