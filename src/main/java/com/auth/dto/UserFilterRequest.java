@@ -2,12 +2,10 @@ package com.auth.dto;
 
 
 public record UserFilterRequest( 
-
       String name,
-  String email,
-
+      String email,
       String role,
-
-      Boolean isActive) {
+      Boolean isActive,
+      String phone) {
 
 }

@@ -20,7 +20,7 @@ public interface AuthService {
 	
 	public	ProfileResponse getProfile(String token);
 	
-	public	String updateUserStatus(UpdateUserStatus request);
+	public	String updateUserStatus(UpdateUserStatus request, String userId);
 	
 	public	String resetPassword(ResetPasswordRequest request);
 

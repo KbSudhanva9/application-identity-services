@@ -1,5 +1,8 @@
 package com.auth.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -33,13 +36,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleValidation(
             MethodArgumentNotValidException e
     ) {
+    	
+    	Map<String, String> errors = new HashMap<>();
+
+        e.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
                         new ApiResponse<>(
                                 "Validation failed",
-                                HttpStatus.BAD_REQUEST.value()
+                                errors
+//                                HttpStatus.BAD_REQUEST.value()
                         )
                 );
     }

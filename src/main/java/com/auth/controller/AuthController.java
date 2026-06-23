@@ -119,14 +119,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<?>> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatus request){
     	try {
     	//	request.setUserId(userId);
-			String response = authService.updateUserStatus(request);
+			String response = authService.updateUserStatus(request, String.valueOf(userId));
 			return ResponseEntity.ok(new ApiResponse<>(response, null));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
 		}
     }
     
-  /*  
     @PostMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> getUsersList(
@@ -149,7 +148,7 @@ public class AuthController {
                     .body(new ApiResponse<>(e.getMessage(), null));
         }
     }
-    */
+
     @PatchMapping("/{userId}/reset-password")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> resetPassword(
@@ -189,7 +188,7 @@ public class AuthController {
     public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
         try {
             String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
-System.out.println("requestOtp" +otpRequest );
+            System.out.println("requestOtp" +otpRequest );
             if ("email".equals(channel)) {
                 String email = otpRequest.email();
                 

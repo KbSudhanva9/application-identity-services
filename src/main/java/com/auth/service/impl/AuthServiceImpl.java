@@ -72,9 +72,9 @@ public class AuthServiceImpl implements AuthService {
 
     public String register(RegisterRequest request) {
 
-//        if (userRepository.existsByEmail(request.email())) {
-//            throw new RuntimeException("Email already exists");
-//        }
+        if (userRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already exists");
+        }
         
         boolean validRole = java.util.Arrays.stream(Role.values())
 				.anyMatch(role -> role.toString().equalsIgnoreCase(request.role()));
@@ -91,6 +91,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(Role.valueOf(request.role().toUpperCase()).toString())	;
+        user.setPhone(request.phone());
         user.setActive(true) ; 
           
 
@@ -296,9 +297,11 @@ public class AuthServiceImpl implements AuthService {
     
     
     
-    public String updateUserStatus(UpdateUserStatus request) {
+    public String updateUserStatus(UpdateUserStatus request, String userId) {
+    	
     	User user = userRepository
-    					.findByUserId(request.userId())
+    					.findById(userId)
+//    					.findByUserId(request.userId())
     					.orElseThrow(() -> new RuntimeException("User not found..")
     							);
     	
@@ -307,6 +310,7 @@ public class AuthServiceImpl implements AuthService {
     	
     	return "User status updated successfully";
     }
+    
     
     public PaginationResponse getUsersList(UserFilterRequest request, Integer page, Integer size) {
 

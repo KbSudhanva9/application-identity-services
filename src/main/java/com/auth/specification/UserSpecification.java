@@ -42,6 +42,12 @@ public class UserSpecification {
                 predicates.add(
                         cb.equal(root.get("isActive"), request.isActive()));
             }
+            
+            // IS ACTIVE
+            if (request.phone() != null && !request.phone().trim().isEmpty()) {
+                predicates.add(
+                        cb.like(root.get("phone"),  "%" + request.phone() + "%"));
+            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

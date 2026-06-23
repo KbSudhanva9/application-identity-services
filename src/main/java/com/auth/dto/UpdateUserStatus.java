@@ -12,7 +12,7 @@ package com.auth.dto;
 
 public record UpdateUserStatus (
 
-     String userId,
+//     String userId,
 
     boolean isActive) {
 }

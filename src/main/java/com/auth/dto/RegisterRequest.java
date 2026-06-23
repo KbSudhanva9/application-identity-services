@@ -14,7 +14,10 @@ public record RegisterRequest (
 		String password,
 
 		@NotBlank
-		String role
+		String role,
+		
+		@NotBlank
+		String phone
 		
 		){
 	
