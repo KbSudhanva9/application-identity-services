@@ -54,11 +54,11 @@ public class AuthController {
         try {
             String response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>(response,null)
+                    .body(new ApiResponse<>(response,"N/A", "N/A", "N/A")
                     );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(e.getMessage(), null)
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A")
                     );
         }
     }
@@ -69,11 +69,11 @@ public class AuthController {
         	System.out.println(" Entering login " +request);
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(
-                    new ApiResponse<>("Login successful", response )
+                    new ApiResponse<>("Login successful", "N/A", response, "N/A" )
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(e.getMessage(), null)
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A")
                     );
         }
     }
@@ -84,11 +84,11 @@ public class AuthController {
         try {
             AuthResponse response = authService.refreshToken(request.refreshToken());
             return ResponseEntity.ok(
-                    new ApiResponse<>("Token refreshed successfully",response)
+                    new ApiResponse<>("Token refreshed successfully", "N/A", response, "N/A")
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(e.getMessage(), null)
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A")
                     );
         }
     }
@@ -96,9 +96,9 @@ public class AuthController {
     @GetMapping("/session/exchange")
     public ResponseEntity<ApiResponse<?>> exchange(@RequestParam String sessionId){
     	try {
-    		return ResponseEntity.ok( new ApiResponse<>("Session Generated Sussfully", authService.exchangeSession(sessionId)));
+    		return ResponseEntity.ok( new ApiResponse<>("Session Generated Sussfully", "N/A", authService.exchangeSession(sessionId), "N/A"));
     	} catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(e.getMessage(), null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A")
                     );
         }
     }
@@ -107,10 +107,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<?>> getProfile(@RequestHeader("Authorization") String token) {
         try {
             ProfileResponse response = authService.getProfile(token);
-            return ResponseEntity.ok(new ApiResponse<>("Profile fetched successfully", response));
+            return ResponseEntity.ok(new ApiResponse<>("Profile fetched successfully", response, "N/A", "N/A"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(e.getMessage(), null));
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A"));
         }
     }
     
@@ -120,9 +120,9 @@ public class AuthController {
     	try {
     	//	request.setUserId(userId);
 			String response = authService.updateUserStatus(request, String.valueOf(userId));
-			return ResponseEntity.ok(new ApiResponse<>(response, null));
+			return ResponseEntity.ok(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
 		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), null));
+			return ResponseEntity.badRequest().body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A"));
 		}
     }
     
@@ -140,12 +140,12 @@ public class AuthController {
 
         try {
             PaginationResponse response = authService.getUsersList(request, page, size);
-            return ResponseEntity.ok(new ApiResponse<>("Users fetched successfully", response));
+            return ResponseEntity.ok(new ApiResponse<>("Users fetched successfully", response, "N/A", "N/A"));
 
         } catch (Exception e) {
 
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse<>(e.getMessage(), null));
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A"));
         }
     }
 
@@ -158,14 +158,32 @@ public class AuthController {
         try {
           //  request.setUserId(userId);
             String response = authService.resetPassword(request);
-            return ResponseEntity.ok(new ApiResponse<>(response, null));
+            return ResponseEntity.ok(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
 
         } catch (Exception e) {
 
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse<>(e.getMessage(), null));
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A"));
         }
     }
+    
+//    @PatchMapping("/forget-password")
+//    public ResponseEntity<ApiResponse<?>> forgetPassword(
+////            @PathVariable String userId,
+//            @RequestBody ResetPasswordRequest request) {
+//
+//        try {
+//          //  request.setUserId(userId);
+//            String response = authService.resetPassword(request);
+//            return ResponseEntity.ok(new ApiResponse<>(response, null));
+//
+//        } catch (Exception e) {
+//
+//            return ResponseEntity.badRequest()
+//                    .body(new ApiResponse<>(e.getMessage(), null));
+//        }
+//    }
+    
    /* 
     @PostMapping("/request-otp")
     public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
@@ -193,11 +211,11 @@ public class AuthController {
                 String email = otpRequest.email();
                 
                 if (email == null || email.isBlank()) {
-                    return ResponseEntity.badRequest().body(new ApiResponse<>("Email field is required for email channel.", null));
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("Email field is required for email channel.", "N/A", "N/A", "N/A"));
 //                    		body("Email field is required for email channel.");
                 }
                 if (!authService.isUserExists(email)) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with email does not exist.", null));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with email does not exist.", "N/A", "N/A", "N/A"));
 //                    		body("User with email does not exist.");
                 }
                 otpService.sendOtpEmail(email);
@@ -205,20 +223,20 @@ public class AuthController {
             } else { // SMS or WhatsApp
                 String phone = otpRequest.phone();
                 if (phone == null || phone.isBlank()) {
-                    return ResponseEntity.badRequest().body(new ApiResponse<>("PhoneNumber field is required for mobile channels.", null));
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("PhoneNumber field is required for mobile channels.", "N/A", "N/A", "N/A"));
 //                    		body("PhoneNumber field is required for mobile channels.");
                 }
                 if (!authService.isUserPhoneExists(phone)) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with phone number does not exist.", null));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with phone number does not exist.", "N/A", "N/A", "N/A"));
 //                    		body("User with phone number does not exist.");
                 }
                 otpService.sendOtpMobile(phone, channel);
             }
 
-            return ResponseEntity.ok(new ApiResponse<>("OTP sent successfully via " + channel.toUpperCase() + ".", null));
+            return ResponseEntity.ok(new ApiResponse<>("OTP sent successfully via " + channel.toUpperCase() + ".", "N/A", "N/A", "N/A"));
 //            		("OTP sent successfully via " + channel.toUpperCase() + ".");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("Failed to deliver OTP: " + e.getMessage(), null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("Failed to deliver OTP: " + e.getMessage(), "N/A", "N/A", "N/A"));
 //            		body("Failed to deliver OTP: " + e.getMessage());
         }
     }
@@ -231,25 +249,18 @@ public class AuthController {
 		String otp = otpRequest.otp();
 	
     	System.out.println("verifyOtp OTP request : " + target + " with OTP: " + otp);
-    	if (otpService.validateOtp(target, otp)) {
-            return ResponseEntity.ok(new ApiResponse<>("User Verified.", null));
-//            		("User Verified.");
+    	
+    	AuthResponse response = otpService.validateOtp(target, otp, otpRequest);
+    	
+//    	if (otpService.validateOtp(target, otp, otpRequest)) {
+    	if(!(response==null)) {
+    		
+            return ResponseEntity.ok(new ApiResponse<>("User Verified.", "N/A", response, "N/A"));
         }
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ApiResponse<>("Invalid or expired code.", null));
-//        		body("Invalid or expired code.");
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ApiResponse<>("Invalid or expired code.", "N/A", "N/A", "N/A"));
+
     }
     
-//    try {
-//    	System.out.println(" Entering login " +request);
-//        AuthResponse response = authService.login(request);
-//        return ResponseEntity.ok(
-//                new ApiResponse<>("Login successful", response )
-//        );
-//    } catch (Exception e) {
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                .body(new ApiResponse<>(e.getMessage(), null)
-//                );
-//    }
     
 }
 

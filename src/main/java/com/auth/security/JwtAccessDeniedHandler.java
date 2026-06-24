@@ -35,6 +35,8 @@ public class JwtAccessDeniedHandler
         ApiResponse<?> apiResponse =
                 new ApiResponse<>(
                         "Access denied",
+                        null,
+                        null,
                         403
                 );
 

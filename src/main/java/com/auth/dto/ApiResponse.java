@@ -2,7 +2,9 @@ package com.auth.dto;
 
 public record ApiResponse<T>(
 	    String message,
-		T data
+		T data,
+		T jwt,
+		T error
 		) {
 }
 

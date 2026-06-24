@@ -76,15 +76,19 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Email already exists");
         }
         
-        boolean validRole = java.util.Arrays.stream(Role.values())
-				.anyMatch(role -> role.toString().equalsIgnoreCase(request.role()));
+        if (userRepository.existsByPhone(request.phone())) {
+        	throw new RuntimeException("Phone already exists with another user account");
+        }
         
-        if (!validRole) {
-        	throw new RuntimeException(
-        	        "Invalid role. Please select one of the following: " +
-        	        java.util.Arrays.toString(Role.values())
-        	    );
-		}
+//        boolean validRole = java.util.Arrays.stream(Role.values())
+//				.anyMatch(role -> role.toString().equalsIgnoreCase(request.role()));
+        
+//        if (!validRole) {
+//        	throw new RuntimeException(
+//        	        "Invalid role. Please select one of the following: " +
+//        	        java.util.Arrays.toString(Role.values())
+//        	    );
+//		}
 
         User user = new User();
         user.setName(request.name());
@@ -106,8 +110,10 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        MasterRedirections redirectionUrl = masterRedirectionsRepository.findByRole(
-        		user.getRole().toString());
+        MasterRedirections redirectionUrl = masterRedirectionsRepository.findByRole(user.getRole().toString());
+        
+        MasterRedirections callbackUrl = masterRedirectionsRepository.findByRole("CALL_BACK");
+//        		findByRole(user.getRole().toString());
 
         if(user.isActive() == false) {
         	throw new RuntimeException("User is in-active, Please contact to support.");
@@ -148,7 +154,8 @@ public class AuthServiceImpl implements AuthService {
 //                refreshToken,
                 sessionId,
                 redirectionUrl.getRedirectUrl(),
-                "http://localhost:5173/"
+                callbackUrl.getRedirectUrl()
+//                "http://localhost:5173/"
         );
     }
     
@@ -156,6 +163,9 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse refreshToken(String refreshToken) {
 
         boolean valid = jwtUtil.validateRefreshToken(refreshToken);
+        
+
+        MasterRedirections callbackUrl = masterRedirectionsRepository.findByRole("CALL_BACK");
 
         if (!valid) {
             throw new RuntimeException("Invalid refresh token");
@@ -197,7 +207,7 @@ public class AuthServiceImpl implements AuthService {
                 newRefreshToken,
                 sessionId,
                 null,
-                null
+                callbackUrl.getRedirectUrl()
         );        
     }
     

@@ -35,6 +35,8 @@ public class JwtAuthenticationEntryPoint
         ApiResponse<?> apiResponse =
                 new ApiResponse<>(
                         "Unauthorized access",
+                        null,
+                        null,
                         401
                 );
 

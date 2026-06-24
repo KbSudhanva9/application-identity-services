@@ -26,6 +26,8 @@ public class GlobalExceptionHandler {
                 .body(
                         new ApiResponse<>(
                                 e.getMessage(),
+                                null,
+								null,
                                 HttpStatus.INTERNAL_SERVER_ERROR.value()
                         )
                 );
@@ -48,6 +50,8 @@ public class GlobalExceptionHandler {
                 .body(
                         new ApiResponse<>(
                                 "Validation failed",
+                                null,
+                                null,
                                 errors
 //                                HttpStatus.BAD_REQUEST.value()
                         )
@@ -65,6 +69,8 @@ public class GlobalExceptionHandler {
                 .body(
                         new ApiResponse<>(
                                 "Access denied",
+                                null,
+                                null,
                                 HttpStatus.FORBIDDEN.value()
                         )
                 );

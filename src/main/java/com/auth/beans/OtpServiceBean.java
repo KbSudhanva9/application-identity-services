@@ -2,19 +2,33 @@ package com.auth.beans;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.auth.dto.AuthResponse;
 import com.auth.dto.OtpDetails;
+import com.auth.dto.OtpRequest;
+import com.auth.entity.MasterRedirections;
+import com.auth.entity.User;
+import com.auth.entity.UserSession;
+import com.auth.enums.TokenType;
+import com.auth.repository.MasterRedirectionsRepository;
+import com.auth.repository.UserRepository;
+import com.auth.repository.UserSessionRepository;
+import com.auth.util.JwtUtil;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
 import jakarta.annotation.PostConstruct;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -38,6 +52,18 @@ public class OtpServiceBean {
 
     @Value("${twilio.whatsapp-sender:}")
     private String whatsappSender;
+    
+    @Autowired
+    private MasterRedirectionsRepository masterRedirectionsRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private UserSessionRepository userSessionRepository;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // Shared Cache: Stores either the email OR phone number mapped against OTP metadata
     private final Map<String, OtpDetails> otpCache = new ConcurrentHashMap<>();
@@ -117,9 +143,12 @@ public class OtpServiceBean {
     }
 
     // 2. Validate OTP with Expiration Checks (Universally handles both Email and Phone keys!)
-    public boolean validateOtp(String target, String userInputOtp) {
+    public AuthResponse validateOtp(String target, String userInputOtp, OtpRequest request) {
+    	
+    	MasterRedirections callbackUrl = masterRedirectionsRepository.findByRole("CALL_BACK");
+    	
         if (!otpCache.containsKey(target)) {
-            return false; // No OTP requested for this identifier
+            return null; // No OTP requested for this identifier
         }
 
         OtpDetails details = otpCache.get(target);
@@ -127,16 +156,70 @@ public class OtpServiceBean {
         // Check if the 3-minute window has closed
         if (details.isExpired()) {
             otpCache.remove(target); // Clean up expired data
-            return false;
+            return null; // OTP has expired
         }
 
         // Match user code against cached code
         if (details.getCode().equals(userInputOtp)) {
-            otpCache.remove(target); // Invalidate instantly on success to prevent replay attacks
-            return true;
+        	
+        	
+        	OtpRequest req = request;
+        	
+        	req.channel();
+        	
+        	User user;// = null; 
+        	MasterRedirections redirectionUrl;// =null;
+        	
+        	if(req.channel().equalsIgnoreCase("email")) {
+        		user = userRepository.findByEmail(req.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        		redirectionUrl = masterRedirectionsRepository.findByRole(user.getRole().toString());
+        	} else if(req.channel().equalsIgnoreCase("sms") || req.channel().equalsIgnoreCase("whatsapp")) {
+        		user = userRepository.findByPhone(req.phone()).orElseThrow(() -> new RuntimeException("User not found"));
+        		redirectionUrl = masterRedirectionsRepository.findByRole(user.getRole().toString());
+        	} else {
+        		throw new RuntimeException("Invalid channel specified");
+        	}
+        	
+        	if(user.isActive() == false) {
+            	throw new RuntimeException("User is in-active, Please contact to support.");
+            }
+        	
+        	String accessToken = jwtUtil.generateAccessToken(
+                    user.getEmail(),
+                    user.getRole(),
+                    user.getUserId(),
+                    TokenType.SSO_LOGIN.name()
+            );
+        	
+        	String sessionId = UUID.randomUUID().toString();
+            
+            UserSession session = new UserSession();
+            
+            session.setUserId(user.getUserId());
+            session.setSessionId(sessionId);
+            session.setSessionType(TokenType.SSO_LOGIN.name());
+            session.setAccessToken(accessToken);
+            session.setExpireTime(LocalDateTime.now().plusMinutes(5));
+            session.setCreatedOn(LocalDateTime.now());
+            
+            userSessionRepository.save(session);
+            
+            otpCache.remove(target);
+
+            return new AuthResponse(
+                    accessToken,
+                    "N/A",
+                    sessionId,
+                    redirectionUrl.getRedirectUrl(),
+                    callbackUrl.getRedirectUrl()
+            );
+        	
+//            otpCache.remove(target); // Invalidate instantly on success to prevent replay attacks
+            
+//            return new AuthResponse("OTP validated successfully", callbackUrl.getRedirectionUrl(), null, null);
         }
 
-        return false;
+        return null; // OTP mismatch
     }
 
 	
