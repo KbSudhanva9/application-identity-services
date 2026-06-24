@@ -185,7 +185,7 @@ public class AuthController {
     }
 */
     @PostMapping("/request-otp")
-    public ResponseEntity<String> requestOtp(@RequestBody OtpRequest otpRequest) {
+    public ResponseEntity<ApiResponse<?>> requestOtp(@RequestBody OtpRequest otpRequest) {
         try {
             String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
             System.out.println("requestOtp" +otpRequest );
@@ -193,32 +193,38 @@ public class AuthController {
                 String email = otpRequest.email();
                 
                 if (email == null || email.isBlank()) {
-                    return ResponseEntity.badRequest().body("Email field is required for email channel.");
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("Email field is required for email channel.", null));
+//                    		body("Email field is required for email channel.");
                 }
                 if (!authService.isUserExists(email)) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email does not exist.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with email does not exist.", null));
+//                    		body("User with email does not exist.");
                 }
                 otpService.sendOtpEmail(email);
                 
             } else { // SMS or WhatsApp
                 String phone = otpRequest.phone();
                 if (phone == null || phone.isBlank()) {
-                    return ResponseEntity.badRequest().body("PhoneNumber field is required for mobile channels.");
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("PhoneNumber field is required for mobile channels.", null));
+//                    		body("PhoneNumber field is required for mobile channels.");
                 }
                 if (!authService.isUserPhoneExists(phone)) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with phone number does not exist.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with phone number does not exist.", null));
+//                    		body("User with phone number does not exist.");
                 }
                 otpService.sendOtpMobile(phone, channel);
             }
 
-            return ResponseEntity.ok("OTP sent successfully via " + channel.toUpperCase() + ".");
+            return ResponseEntity.ok(new ApiResponse<>("OTP sent successfully via " + channel.toUpperCase() + ".", null));
+//            		("OTP sent successfully via " + channel.toUpperCase() + ".");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deliver OTP: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("Failed to deliver OTP: " + e.getMessage(), null));
+//            		body("Failed to deliver OTP: " + e.getMessage());
         }
     }
 
     @PostMapping("/verify-otp")
-	public ResponseEntity<String> verifyOtp(@RequestBody OtpRequest otpRequest) {
+	public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody OtpRequest otpRequest) {
     	System.out.println("Entering  verifyOtp " +otpRequest);
     	//String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
 		String target = (otpRequest.email() == null) ? otpRequest.phone():otpRequest.email();
@@ -226,12 +232,24 @@ public class AuthController {
 	
     	System.out.println("verifyOtp OTP request : " + target + " with OTP: " + otp);
     	if (otpService.validateOtp(target, otp)) {
-            return ResponseEntity.ok("User Verified.");
+            return ResponseEntity.ok(new ApiResponse<>("User Verified.", null));
+//            		("User Verified.");
         }
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Invalid or expired code.");
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ApiResponse<>("Invalid or expired code.", null));
+//        		body("Invalid or expired code.");
     }
     
-    
+//    try {
+//    	System.out.println(" Entering login " +request);
+//        AuthResponse response = authService.login(request);
+//        return ResponseEntity.ok(
+//                new ApiResponse<>("Login successful", response )
+//        );
+//    } catch (Exception e) {
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                .body(new ApiResponse<>(e.getMessage(), null)
+//                );
+//    }
     
 }
 
