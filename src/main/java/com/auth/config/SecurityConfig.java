@@ -45,11 +45,13 @@ public class SecurityConfig {
         			.requestMatchers(
         					 "/auth/request-otp",
         					 "/auth/verify-otp",
-                                "/auth/register",
-                                "/auth/login",
-                                "/auth/refresh",
-                                "/auth/session/**"
-//                                ,"/auth"
+                             "/auth/register",
+                             "/auth/login",
+                             "/auth/refresh",
+                             "/auth/session/**",
+                             "/auth/valid-user",
+                             "/auth/reset-password-otp",
+                             "/auth/reset-password"
         					).permitAll()
         			.anyRequest().authenticated())
 //        	.httpBasic(Customizer.withDefaults());

@@ -31,7 +31,11 @@ public class LoggingInterceptor implements HandlerInterceptor {
 //        		.userId(request.getProtocol())
 //        		.message(request.getUserPrincipal().toString())
 //        		.userId(request.get)
-                log.setApiEndpoint(request.getRequestURI());
+        log.setUserId(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "Anonymous");
+//        log.setReferenceId(request.getHeader("userId") != null ? request.getHeader("userId") : "Anonymous");
+//        log.setReferenceId(request.getAttribute("email") != null ? request.getAttribute("email").toString() : "Anonymous");
+//        log.setReferenceId(request.getAttribute(""));
+        log.setApiEndpoint(request.getRequestURI());
         log.setHttpMethod(request.getMethod());
         log.setIpAddress(request.getRemoteAddr());
         log.setLoggedOn(LocalDateTime.now());

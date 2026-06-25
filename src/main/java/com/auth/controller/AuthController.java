@@ -17,16 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.auth.beans.OtpServiceBean;
 import com.auth.dto.ApiResponse;
 import com.auth.dto.AuthResponse;
+import com.auth.dto.ForceResetPasswordRequest;
 import com.auth.dto.LoginRequest;
 import com.auth.dto.OtpRequest;
 import com.auth.dto.PaginationResponse;
 import com.auth.dto.ProfileResponse;
 import com.auth.dto.RefreshTokenRequest;
 import com.auth.dto.RegisterRequest;
-import com.auth.dto.ResetPasswordRequest;
 import com.auth.dto.UpdateUserStatus;
 import com.auth.dto.UserFilterRequest;
-import com.auth.dto.UserResponse;
 import com.auth.service.AuthService;
 
 
@@ -149,15 +148,15 @@ public class AuthController {
         }
     }
 
-    @PatchMapping("/{userId}/reset-password")
+    @PatchMapping("/{userId}/force-reset-password")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> resetPassword(
             @PathVariable String userId,
-            @RequestBody ResetPasswordRequest request) {
+            @RequestBody ForceResetPasswordRequest request) {
 
         try {
           //  request.setUserId(userId);
-            String response = authService.resetPassword(request);
+            String response = authService.forceResetPassword(request);
             return ResponseEntity.ok(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
 
         } catch (Exception e) {
@@ -260,6 +259,103 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ApiResponse<>("Invalid or expired code.", "N/A", "N/A", "N/A"));
 
     }
+    
+    
+    
+    @PostMapping("/valid-user")
+    public ResponseEntity<ApiResponse<?>> isValidUser(@RequestBody OtpRequest otpRequest) {
+		String target = (otpRequest.email() == null) ? otpRequest.phone() : otpRequest.email();
+		String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
+		if(target==null || target.isBlank() || channel==null || channel.isBlank()) {
+			return ResponseEntity.badRequest().body(new ApiResponse<>("Target and channel fields are required.", "N/A", "N/A", "error"));
+		}else if (channel.equals("email")) {
+			if (!authService.isUserExists(otpRequest.email())) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with email does not exist.", "N/A", "N/A", "error"));
+			} else {
+				return ResponseEntity.ok(new ApiResponse<>("User email existence check completed.", true, "N/A", "N/A"));
+			}
+//			return ResponseEntity.ok(new ApiResponse<>("User email existence check completed.", authService.isUserExists(otpRequest.email()),"N/A", "N/A"));
+		} else if (channel.equals("sms") || channel.equals("whatsapp")) {
+			if (!authService.isUserPhoneExists(otpRequest.phone())) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with phone number does not exist.", "N/A", "N/A", "error"));
+			} else {
+				return ResponseEntity.ok(new ApiResponse<>("User phone existence check completed.", true, "N/A", "N/A"));
+			}
+//			return ResponseEntity.ok(new ApiResponse<>("User phone existence check completed.", authService.isUserPhoneExists(otpRequest.phone()),"N/A", "N/A"));
+		} else {
+			return ResponseEntity.badRequest().body(new ApiResponse<>("Invalid channel. Must be 'email', 'sms', or 'whatsapp'.", "N/A", "N/A", "error"));
+		}
+	}
+    
+    
+//    -------------------reset password with otp-------------------
+    
+    @PostMapping("/reset-password-otp")
+    public ResponseEntity<ApiResponse<?>> resetPasswordOtp(@RequestBody OtpRequest otpRequest) {
+        try {
+            String channel = (otpRequest.channel() != null) ? otpRequest.channel().toLowerCase() : "email";
+            System.out.println("requestOtp" +otpRequest );
+            if ("email".equals(channel)) {
+                String email = otpRequest.email();
+                
+                if (email == null || email.isBlank()) {
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("Email field is required for email channel.", "N/A", "N/A", "N/A"));
+//                    		body("Email field is required for email channel.");
+                }
+                if (!authService.isUserExists(email)) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with email does not exist.", "N/A", "N/A", "N/A"));
+//                    		body("User with email does not exist.");
+                }
+                otpService.sendResetOtpEmail(email);
+                
+            } else { // SMS or WhatsApp
+                String phone = otpRequest.phone();
+                if (phone == null || phone.isBlank()) {
+                    return ResponseEntity.badRequest().body(new ApiResponse<>("PhoneNumber field is required for mobile channels.", "N/A", "N/A", "N/A"));
+//                    		body("PhoneNumber field is required for mobile channels.");
+                }
+                if (!authService.isUserPhoneExists(phone)) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>("User with phone number does not exist.", "N/A", "N/A", "N/A"));
+//                    		body("User with phone number does not exist.");
+                }
+                otpService.sendResetOtpMobile(phone, channel);
+            }
+
+            return ResponseEntity.ok(new ApiResponse<>("Password reset OTP sent successfully via " + channel.toUpperCase() + ".", "N/A", "N/A", "N/A"));
+//            		("OTP sent successfully via " + channel.toUpperCase() + ".");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("Failed to deliver OTP: " + e.getMessage(), "N/A", "N/A", "N/A"));
+//            		body("Failed to deliver OTP: " + e.getMessage());
+        }
+    }
+    
+    @PatchMapping("/reset-password")
+    public ResponseEntity<ApiResponse<?>> resetPassword(@RequestBody OtpRequest request) {
+    	
+    	String target = (request.email() == null) ? request.phone():request.email();
+		String otp = request.otp();
+
+        try {
+          //  request.setUserId(userId);
+            String response = otpService.resetPasswordWithValidateOtp(target, otp, request);
+//            		authService.resetPassword(request);
+//            return ResponseEntity.ok(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
+            
+            if(response.contains("OTP verified")) {
+				return ResponseEntity.ok(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
+			}else {
+				return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ApiResponse<>(response, "N/A", "N/A", "N/A"));
+			}
+
+        } catch (Exception e) {
+
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), "N/A", "N/A", "N/A"));
+        }
+    }
+    
+
+//  -------------------reset password with otp-------------------
     
     
 }

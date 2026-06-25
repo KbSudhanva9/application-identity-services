@@ -1,14 +1,13 @@
 package com.auth.service;
 
 import com.auth.dto.AuthResponse;
+import com.auth.dto.ForceResetPasswordRequest;
 import com.auth.dto.LoginRequest;
 import com.auth.dto.PaginationResponse;
 import com.auth.dto.ProfileResponse;
 import com.auth.dto.RegisterRequest;
-import com.auth.dto.ResetPasswordRequest;
 import com.auth.dto.UpdateUserStatus;
 import com.auth.dto.UserFilterRequest;
-import com.auth.dto.UserResponse;
 
 public interface AuthService {
 	
@@ -22,7 +21,9 @@ public interface AuthService {
 	
 	public	String updateUserStatus(UpdateUserStatus request, String userId);
 	
-	public	String resetPassword(ResetPasswordRequest request);
+	public	String forceResetPassword(ForceResetPasswordRequest request);
+	
+//	public	String resetPassword(ResetPasswordRequest request);
 
 	public	AuthResponse exchangeSession(String session);
 	

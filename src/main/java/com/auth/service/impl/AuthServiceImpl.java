@@ -12,11 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.auth.dto.AuthResponse;
+import com.auth.dto.ForceResetPasswordRequest;
 import com.auth.dto.LoginRequest;
 import com.auth.dto.PaginationResponse;
 import com.auth.dto.ProfileResponse;
 import com.auth.dto.RegisterRequest;
-import com.auth.dto.ResetPasswordRequest;
 import com.auth.dto.UpdateUserStatus;
 import com.auth.dto.UserFilterRequest;
 import com.auth.dto.UserResponse;
@@ -351,7 +351,7 @@ public class AuthServiceImpl implements AuthService {
     }
     
     
-    public String resetPassword(ResetPasswordRequest request) {
+    public String forceResetPassword(ForceResetPasswordRequest request) {
 
         User user = userRepository
                 .findByUserId(request.userId())
@@ -363,6 +363,21 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         return "Force password reset successfully";
     }
+    
+//    public String resetPassword(ResetPasswordRequest request) {
+//
+//    	
+//    	
+//        User user; // = userRepository
+////                .findByUserId(request.userId())
+////                .orElseThrow(() ->
+////                        new RuntimeException("User not found")
+////                );
+//
+////        user.setPassword(passwordEncoder.encode(request.password()));
+////        userRepository.save(user);
+//        return "Force password reset successfully";
+//    }
 
 //	@Override
 	public boolean  isUserExists(String email) {
