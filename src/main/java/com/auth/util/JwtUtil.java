@@ -133,6 +133,7 @@ public class JwtUtil {
         }
     }
     
+//    validating access token from token type
     public boolean validateAccessTokenServices(String token) {
         try {
             Claims claims = extractClaims(token);

@@ -46,12 +46,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         String tokenType = jwtUtil.extractTokenType(token);
         
-        if(!tokenType.equals(TokenType.LOGIN_TOKEN.name())){
-//        	System.out.println(tokenType);
-            throw new RuntimeException(
-                    "Invalid token type"
-            );
-        }
+//        if(!tokenType.equals(TokenType.LOGIN_TOKEN.name())){
+////        	System.out.println(tokenType);
+//            throw new RuntimeException(
+//                    "Invalid token type"
+//            );
+//        }
 
         boolean valid = jwtUtil.validateAccessToken(token);
 

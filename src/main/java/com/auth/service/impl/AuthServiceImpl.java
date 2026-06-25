@@ -135,6 +135,12 @@ public class AuthServiceImpl implements AuthService {
                 TokenType.SSO_LOGIN.name()
         );
         
+        String refreshToken = jwtUtil.generateRefreshToken(
+        		user.getUserId(),
+                user.getEmail(),
+                TokenType.REFRESH_TOKEN.name()
+        );
+        
         String sessionId = UUID.randomUUID().toString();
         
         UserSession session = new UserSession();
@@ -143,15 +149,16 @@ public class AuthServiceImpl implements AuthService {
         session.setSessionId(sessionId);
         session.setSessionType(TokenType.SSO_LOGIN.name());
         session.setAccessToken(accessToken);
-        session.setExpireTime(LocalDateTime.now().plusMinutes(5));
+        session.setExpireTime(LocalDateTime.now().plusMinutes(60));
+//        session.setExpireTime(LocalDateTime.now().plusMinutes(5));
         session.setCreatedOn(LocalDateTime.now());
         
         userSessionRepository.save(session);
 
         return new AuthResponse(
                 accessToken,
-                "N/A",
-//                refreshToken,
+//                "N/A",
+                refreshToken,
                 sessionId,
                 redirectionUrl.getRedirectUrl(),
                 callbackUrl.getRedirectUrl()
@@ -220,8 +227,9 @@ public class AuthServiceImpl implements AuthService {
 
         token = token.substring(7);
 
-        boolean valid = jwtUtil.validateAccessTokenServices(token);
-//        		validateAccessToken(token);
+        boolean valid = jwtUtil.
+//        		validateAccessTokenServices(token);
+        		validateAccessToken(token);
 
         if (!valid) {
             throw new RuntimeException("Invalid access token");
